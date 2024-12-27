@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast Website</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <video id="weather-video" autoplay muted loop></video>
+    
+    <header>
+        <div>       
+            <h1>Weather Forecast Website</h1>
+        </div>
+        <div id="input">
+            <input type="text" class="city" placeholder="Enter a city Name" />
+            <button onclick="weather()">Search</button>
+        </div>
+    </header>
+
+    <!-- Video and image based on weather conditions -->
+    
+    <div class="container">
+        <div id="pic">
+            <div id="div1">
+                <p class="countryname"></p>
+                <div id="ppp">
+                    <img src="./images/icons8-temperature-50.png" alt=""> 
+                    <p class="temp"></p>
+                </div> 
+                <div class="heze">
+                    <p class="haze"></p>
+                    <p class="feelslike"></p>
+                </div>
+            </div>
+            <div id="div2">
+                <img id="weather-image" src="" alt="Weather Image">
+            </div>
+        </div>
+        <div id="info">
+            <div id="same">
+                <div id="ttt">
+                    <img src="./images/icons8-humidity-sensor-30.png" alt="Humidity Icon">
+                    <p class="humidity"></p>
+                </div>
+                <div id="ttt">
+                    <img src="./images/icons8-wind-speed-43-47-30.png" alt="Wind Icon">
+                    <p class="wind"></p>
+                </div>
+                <div id="ttt">
+                    <img src="./images/icons8-pressure-30.png" alt="Pressure Icon">
+                    <p class="pressure"></p>
+                </div>
+            </div>
+            <div class="vertical-line"></div>
+            <div id="same2">
+                <div id="ttt">
+                    <img src="./images/icons8-latitude-30.png" alt="Latitude Icon">
+                    <p class="latitude"></p>
+                </div>
+                <div id="ttt">
+                    <img src="./images/icons8-longitude-30.png" alt="Longitude Icon">
+                    <p class="longitude"></p>
+                </div>
+                <div id="ttt">
+                    <img src="./images/wind-sign.png" alt="Wind Degree Icon">
+                    <p class="windDegree"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer><marquee behavior="scroll" direction="left" scrollamount="10"> Design and Developed by <b> <i>Abdul Baseer</i>
+    </b> and <b><i>Haider Rehman</i></b></marquee>
+    </footer> 
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // Function to fetch and display the weather data for a given city
+        function weather() {
+            let cityName = document.querySelector(".city").value || "London";  // Default to London if no city is entered
+            let temp = document.querySelector(".temp");
+            let humidity = document.querySelector(".humidity");
+            let wind = document.querySelector(".wind");
+            let pressure = document.querySelector(".pressure");
+            let feelsLike = document.querySelector(".feelslike");
+            let countryName = document.querySelector(".countryname");
+            let haze = document.querySelector(".haze");
+            let longitude = document.querySelector(".longitude");
+            let latitude = document.querySelector(".latitude");
+            let windDegree = document.querySelector(".windDegree");
+
+            console.log("Fetching weather for city:", cityName);
+
+            axios
+                .get(
+                    `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=1bb1a234b66e41684dbff4a9d98a2d1b&units=metric`
+                )
+                .then(function (response) {
+                    console.log(response); // Log the full response to inspect it
+
+                    // Country Name
+                    countryName.innerHTML = `${response.data.name}, ${response.data.sys.country}`;
+
+                    // Weather Description
+                    const { description, main } = response.data.weather[0];
+                    haze.innerHTML = `${description}`;
+
+                    // Temperature
+                    let temperatureValue = Math.round(response.data.main.temp);
+                    temp.innerHTML = `${temperatureValue}°C`;
+
+                    // Humidity
+                    humidity.innerHTML = `Humidity: ${response.data.main.humidity}%`;
+
+                    // Wind Speed (Convert m/s to km/h)
+                    let kms = Math.round(response.data.wind.speed * 3600 / 1000);
+                    wind.innerHTML = `Wind: ${kms} km/h`;
+
+                    // Pressure
+                    pressure.innerHTML = `Pressure: ${response.data.main.pressure} mb`;
+
+                    // Feels Like Temperature
+                    let feelsLikeTemp = Math.round(response.data.main.feels_like);
+                    feelsLike.innerHTML = `Feels like: ${feelsLikeTemp}°C`;
+
+                    // Latitude and Longitude
+                    latitude.innerHTML = `Latitude: ${response.data.coord.lat}°`;
+                    longitude.innerHTML = `Longitude: ${response.data.coord.lon}°`;
+
+                    // Wind Degree (Wind direction)
+                    windDegree.innerHTML = `Wind Degree: ${response.data.wind.deg}°`;
+
+                    // Set weather-related images and video based on description
+                    setWeatherImageAndVideo(description);
+                })
+                .catch(function (error) {
+                    console.error("Error fetching weather:", error);
+                    alert("There was an error fetching the weather data.");
+                });
+        }
+
+        // Function to set the weather image and video based on the weather description
+        function setWeatherImageAndVideo(description) {
+            let weatherImage = document.getElementById("weather-image");
+            let weatherVideo = document.getElementById("weather-video");
+
+            console.log("Weather description:", description); // Log the description
+
+            // Set the weather image and video based on weather condition
+            if (description.includes("cloud")) {
+                weatherImage.src = "./js-images/cloudy.png"; // Replace with actual path
+                weatherVideo.src = "./js-videos/cloudy.mp4"; // Replace with actual path
+            } else if (description.includes("rain")) {
+                weatherImage.src = "./js-images/rainy.png"; // Replace with actual path
+                weatherVideo.src = "./js-videos/rainy.mp4"; // Replace with actual path
+            } else if (description.includes("haze")) {
+                weatherImage.src = "./js-images/haze.png"; // Replace with actual path
+                weatherVideo.src = "./js-videos/haze.mp4"; // Replace with actual path
+            } else if (description.includes("mist")) {
+                weatherImage.src = "./js-images/mist.png"; // Replace with actual path
+                weatherVideo.src = "./js-videos/mist.mp4"; // Replace with actual path
+            } else if (description.includes("clear") || description.includes("sky")) {
+                weatherImage.src = "./js-images/sunny.png"; // Replace with actual path
+                weatherVideo.src = "./js-videos/sunny.mp4"; // Replace with actual path
+            } else if (description.includes("snow")) {
+                weatherImage.src = "./js-images/snowy.png"; // Replace with actual path
+                weatherVideo.src = "./js-videos/snowy.mp4"; // Replace with actual path
+            } else if (description.includes("thunderstorm")) {
+                weatherImage.src = "./js-images/thunder.png"; // Replace with actual path
+                weatherVideo.src = "./js-videos/thunderstorm.mp4"; // Replace with actual path
+            } else {
+                weatherImage.src = "./images/default.jpg"; // Replace with actual path (default image)
+                weatherVideo.src = "./videos/default.mp4"; // Replace with actual path (default video)
+            }
+
+            // Ensure video is loaded and plays in the background
+            weatherVideo.load();
+            weatherVideo.play();
+        }
+
+        // Call the weather function for the default city (London) on page load
+        window.onload = function() {
+            weather();  // Calls weather with default "London" city
+        };
+    </script>  
+</body>
+</html>
